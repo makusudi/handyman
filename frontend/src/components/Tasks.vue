@@ -8,6 +8,8 @@
       Choose your test case to see how it works: try to create tasks or go to chat and write some text to other people
     </p>
     <p>Websockets Messages: {{ messages }}</p>
+    <el-input label="Hello" v-model="input"></el-input>
+    <el-button @click="submit">Send</el-button>
   </div>
 </template>
 
@@ -16,7 +18,13 @@ export default {
   name: 'Tasks',
   data () {
     return {
-      messages: []
+      messages: [],
+      input: 'Type Here'
+    }
+  },
+  methods: {
+    submit () {
+      this.$socket.emit('custom_message', this.input)
     }
   },
   sockets: {
@@ -27,6 +35,10 @@ export default {
   mounted () {
     this.$socket.connect()
     this.$socket.emit('custom_message', {hello: 'world'})
+  },
+  beforeRouteLeave (to, from, next) {
+    this.$socket.disconnect()
+    next()
   }
 }
 </script>
