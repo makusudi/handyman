@@ -1,44 +1,60 @@
 <template>
-  <div class="container">
-    <p class="font-weight-lighter mb-1" style="font-size: 3rem">Welcome</p>
-    <p class="font-weight-lighter" style="font-size: 1.5rem">
-      This is simple event-driven application powered by Python FastAPI & Vue.js
-    </p>
-    <p class="font-weight-lighter" style="font-size: 1.2rem">
-      Choose your test case to see how it works: try to create tasks or go to chat and write some text to other people
-    </p>
-    <p>Websockets Messages: {{ messages }}</p>
-    <el-input label="Hello" v-model="input"></el-input>
-    <el-button @click="submit">Send</el-button>
+  <div class="container-fluid">
+    <div class="container-fluid d-flex justify-content-between align-items-center">
+
+      <h2 class="font-weight-lighter mb-0">Background tasks</h2>
+
+      <div class="d-flex">
+
+        <el-button type="info" class="mb-2" @click="update">
+          <span class="text-dark">Filter</span>
+        </el-button>
+
+        <CreateTask @addTask="addTaskToList" class="ml-2"/>
+
+      </div>
+
+    </div>
+
+    <el-divider class="bg-dark mt-1"></el-divider>
+
+    <el-row>
+      <Task v-for="(task, index) in tasks" :key="'task__n'+index" :data="task"/>
+    </el-row>
   </div>
 </template>
 
 <script>
+import Task from './TasksEntities/Task'
+import CreateTask from './TasksEntities/CreateTask'
+
 export default {
   name: 'Tasks',
+  components: {
+    Task,
+    CreateTask
+  },
   data () {
     return {
-      messages: [],
+      tasks: [],
       input: 'Type Here'
     }
   },
   methods: {
-    submit () {
-      this.$socket.emit('custom_message', this.input)
+    update () {
+      this.$socket.emit('get_result', {username: 'admin'})
+    },
+    addTaskToList (data) {
+      this.tasks.push(data)
     }
   },
   sockets: {
-    custom_message (data) {
-      this.messages.push(data)
+    get_result (data) {
+      this.tasks = data
     }
   },
   mounted () {
-    this.$socket.connect()
-    this.$socket.emit('custom_message', {hello: 'world'})
-  },
-  beforeRouteLeave (to, from, next) {
-    this.$socket.disconnect()
-    next()
+    this.$socket.emit('get_result', {username: 'admin'})
   }
 }
 </script>
