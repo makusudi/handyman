@@ -18,8 +18,8 @@ Vue.use(new SocketIO({
   options: {
     upgrade: true,
     // path: '/io/socket.io',
-    reconnection: false,
-    autoConnect: false,
+    reconnection: true,
+    autoConnect: true,
     transports: ['websocket', 'polling']
   }
 }))

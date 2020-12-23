@@ -23,5 +23,27 @@ async def main():
     print(f'disconnecting')
     await scl.disconnect()
 
+import aioredis
+
+async def redis():
+    redis = await aioredis.create_redis_pool('redis://127.0.0.1:6379/1')
+    # await redis.set('my-key', '{redis: "redisss"}')
+    # value = await redis.get('my-key', encoding='utf-8')
+    # print(value)
+    print(f'Channels = {redis.channels}')
+    res: asyncio.Future = await redis.publish('/', 'HELLO')
+    print(f'After publishing = {res}')
+    for _ in range(10):
+        print(res.done())
+        await asyncio.sleep(0.5)
+    while True:
+        ch = await redis.keys('*')
+        if ch:
+            print(ch)
+            break
+
+    redis.close()
+
+
 if __name__ == '__main__':
-    asyncio.run(main())
+    asyncio.run(redis())

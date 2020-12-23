@@ -60,10 +60,7 @@ export default {
       done()
     },
     submit () {
-      this.$emit('addTask', {
-        task_id: 'newtask',
-        percent: 74,
-        ...this.form})
+      this.$socket.emit('create_task', this.form)
       this.form.description = ''
       this.form.time = 'Work for...'
       this.form.priority = 'Select priority'

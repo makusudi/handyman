@@ -10,7 +10,7 @@
           <span class="text-dark">Filter</span>
         </el-button>
 
-        <CreateTask @addTask="addTaskToList" class="ml-2"/>
+        <CreateTask class="ml-2"/>
 
       </div>
 
@@ -43,14 +43,14 @@ export default {
   methods: {
     update () {
       this.$socket.emit('get_result', {username: 'admin'})
-    },
-    addTaskToList (data) {
-      this.tasks.push(data)
     }
   },
   sockets: {
     get_result (data) {
       this.tasks = data
+    },
+    create_task (data) {
+      this.tasks.push(data)
     }
   },
   mounted () {
