@@ -1,11 +1,17 @@
 import random
 import sys
-from flask import Flask, session, request
+import eventlet
+from flask import Flask, session
 from flask_socketio import SocketIO, emit, join_room
+import logging
+import uuid
 
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+
+eventlet.monkey_patch()
 
 server = Flask(__name__)
-sio = SocketIO(server, mode='eventlet', message_queue=f'redis://127.0.0.1:6379/0', cors_allowed_origins='*')
+sio = SocketIO(server, mode='eventlet', message_queue='redis://localhost:6379/0', cors_allowed_origins='*')
 
 
 def random_id(length):
@@ -19,9 +25,10 @@ def random_id(length):
 
 
 @sio.on('connect')
-def connect(sid):
-    join_room(sid)
-    print(f'Connected user with sid {sid}', file=sys.stdout, flush=True)
+def connect():
+    session['uid'] = session.get('uid') or str(uuid.uuid4())
+    join_room(session['uid'])
+    print(f'Connected user with sid {session["uid"]}', file=sys.stdout, flush=True)
 
 
 @sio.on('disconnect')
@@ -73,5 +80,4 @@ def info(data):
 
 
 if __name__ == '__main__':
-    sio.run(server, host='0.0.0.0', port=8000, debug=True, log_output=sys.stdout)
-
+    sio.run(server, host='0.0.0.0', port=8000, debug=True)

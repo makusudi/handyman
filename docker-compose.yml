@@ -1,0 +1,31 @@
+version: "3.5"
+services: 
+  redis:
+    image: redis:5-alpine
+    ports:
+      - 6379:6379
+    container_name: simple-chat-redis
+    restart: always
+    environment: 
+      TZ: Europe/Moscow
+    volumes: 
+      - redis:/data
+  postgres:
+    image: postgres:10
+    container_name: simple-chat-db
+    restart: always
+    environment: 
+      POSTGRES_DB: simple_chat
+      POSTGRES_USER: simple_chat
+      POSTGRES_PASSWORD: simple_chat
+      TZ: Europe/Moscow
+    ports: 
+      - 5432:5432
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes: 
+  db:
+    name: simple-chat-db
+  redis:
+    name: simple-chat-redis

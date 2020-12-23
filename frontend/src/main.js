@@ -13,7 +13,7 @@ Vue.use(ElementUI)
 
 Vue.use(new SocketIO({
   debug: true,
-  connection: `ws://127.0.0.1:8000/`,
+  connection: `ws://localhost:8000/`,
   // transports: ['websocket'],
   options: {
     upgrade: true,
