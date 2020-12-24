@@ -5,6 +5,9 @@ from flask import Flask, session
 from flask_socketio import SocketIO, emit, join_room
 import logging
 import uuid
+import json
+import redis
+from celery_app.workers import some_work
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -27,7 +30,8 @@ def random_id(length):
 @sio.on('connect')
 def connect():
     session['uid'] = session.get('uid') or str(uuid.uuid4())
-    join_room(session['uid'])
+    # join_room(session['uid'])
+    join_room('admin')
     print(f'Connected user with sid {session["uid"]}', file=sys.stdout, flush=True)
 
 
@@ -44,33 +48,30 @@ def authenticate(data):
 
 @sio.on('create_task')
 def create_task(data: dict):
+    print(session)
     new: dict = {
         'task_id': random_id(6),
         'description': data.get('description'),
         'username': 'admin',
         'percent': 0,
         'time': data.get('time'),
-        'priority': data.get('priority')
+        'priority': data.get('priority'),
+        'sid': session.get('uid'),
+        'result': None,
+        'ready': False
     }
-    # await sio.manager.emit('create_task', new, to=sid)
+    some_work.apply_async(args=[new])
     emit('create_task', new)
     # await sio.emit('create_task', new, to=sid)
 
 
 @sio.on('get_result')
 def get_result(data):
-    username = data.get('username')
     result = []
-    for x in range(1, random.randint(6, 18)):
-        res = {
-            'username': username,
-            'task_id': random_id(5),
-            'percent': random.randint(1, 100),
-            'description': f'Description for task {x}',
-            'priority': random.choice(['low', 'medium', 'high'])
-        }
-        result.append(res)
-
+    connection = redis.Redis(host='127.0.0.1', port=6379, db=1)
+    keys = connection.keys('*')
+    if keys:
+        result = [json.loads(connection.get(key)) for key in keys]
     return emit('get_result', result)
 
 

@@ -51,6 +51,19 @@ export default {
     },
     create_task (data) {
       this.tasks.push(data)
+    },
+    worker_message (data) {
+      console.log(`Received data `, data)
+      for (let item of this.tasks) {
+        if (item.task_id === data.task_id) {
+          item.percent = parseInt(data.percent)
+          if (item.percent > 99) {
+            const index = this.tasks.indexOf(item)
+            this.tasks.splice(index, 1)
+            this.tasks.push(data)
+          }
+        }
+      }
     }
   },
   mounted () {

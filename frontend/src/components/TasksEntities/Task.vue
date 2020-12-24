@@ -13,7 +13,7 @@
       <el-divider class="my-2"></el-divider>
       <el-row :gutter="24">
         <el-col :span="8">
-          <el-progress type="dashboard" :percentage="data.percent" :color="colors"></el-progress>
+          <el-progress type="dashboard" :percentage="parseInt(data.percent)" :color="colors"></el-progress>
         </el-col>
         <el-col :span="16" class="text-left pl-5 py-2">
 
@@ -22,6 +22,9 @@
 
           <p class="m-0 p-0" style="font-size: 0.9rem; line-height: 1.1"><b><i class="el-icon-user-solid"></i> Owner:</b></p>
           <p class="m-0 p-0 mb-2" style="font-size: 0.9rem; line-height: 1.1">{{ data.username }}</p>
+
+          <p class="m-0 p-0" style="font-size: 0.9rem; line-height: 1.1"><b><i class="el-icon-user-solid"></i> Result:</b></p>
+          <p class="m-0 p-0 mb-2" style="font-size: 0.9rem; line-height: 1.1">{{ data.result ? data.result : 'not ready' }}</p>
 
         </el-col>
       </el-row>
