@@ -1,17 +1,20 @@
 <template>
   <div>
     <el-menu
-      v-if="true"
+      v-if="this.$cookie.get('username')"
       router="true"
-      :default-active="'/'"
+      :default-active="defaultRoute"
       class="el-menu-demo px-4"
       mode="horizontal"
       background-color="#545c64"
       text-color="#fff"
-      active-text-color="#ffd04b">
+      active-text-color="#ffd04b"
+    >
+
       <el-menu-item index="/">Home</el-menu-item>
       <el-menu-item index="/tasks">Tasks</el-menu-item>
-      <el-menu-item index="/chat">Chat</el-menu-item>
+      <el-menu-item index="/chat" disabled>Chat</el-menu-item>
+
     </el-menu>
     <div id="app">
       <transition name="fade">
@@ -24,7 +27,20 @@
 <script>
 export default {
   name: 'App',
+  computed: {
+    defaultRoute () {
+      if (this.$route.fullPath.match('tasks')) {
+        return '/tasks'
+      } else {
+        return '/'
+      }
+    }
+  },
   created () {
+    if (!this.$cookie.get('username')) {
+      this.$router.push('/login')
+      return
+    }
     this.$socket.connect()
     window.onbeforeunload = () => {
       this.$socket.disconnect()

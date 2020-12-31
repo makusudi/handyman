@@ -4,28 +4,54 @@ services:
     image: redis:5-alpine
     ports:
       - 6379:6379
-    container_name: simple-chat-redis
+    container_name: handyman-redis
     restart: always
-    environment: 
+    environment:
       TZ: Europe/Moscow
-    volumes: 
-      - redis:/data
-  postgres:
-    image: postgres:10
-    container_name: simple-chat-db
-    restart: always
-    environment: 
-      POSTGRES_DB: simple_chat
-      POSTGRES_USER: simple_chat
-      POSTGRES_PASSWORD: simple_chat
-      TZ: Europe/Moscow
-    ports: 
-      - 5432:5432
     volumes:
-      - db:/var/lib/postgresql/data
+      - redis:/data
+  celery:
+    image: python:3.8-slim
+    build:
+      context: .
+      dockerfile: dockerfile-celery
+    container_name: handyman-celery
+    links:
+      - "redis:redis_host"
+    restart: always
+    environment:
+      TZ: Europe/Moscow
+  server:
+    image: python:3.8
+    build:
+      context: .
+      dockerfile: dockerfile-backend
+    ports:
+      - 8000:8000
+    links:
+      - "redis:redis_host"
+    container_name: handyman-backend
+    restart: always
+    environment:
+      TZ: Europe/Mocsow
+    depends_on:
+      - redis
+      - celery
+  frontend:
+    image: node:15.5.0-alpine3.10
+    build:
+      context: .
+      dockerfile: dockerfile-frontend
+    ports:
+      - 8080:8080
+    environment:
+      TZ: Europe/Mocsow
+    container_name: handyman-frontend
+    restart: always
+    depends_on:
+      - server
 
-volumes: 
-  db:
-    name: simple-chat-db
+
+volumes:
   redis:
-    name: simple-chat-redis
+    name: handyman-redis

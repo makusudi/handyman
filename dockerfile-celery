@@ -1,0 +1,6 @@
+FROM python:3.8
+WORKDIR /celery
+COPY /backend .
+RUN pip install -r requirements.txt
+WORKDIR /celery/workers
+ENTRYPOINT ["celery", "-A", "asgi_socket_workers.application", "worker", "--loglevel=INFO", "-E"]

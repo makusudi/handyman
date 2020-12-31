@@ -8,8 +8,10 @@ import 'element-ui/lib/theme-chalk/index.css'
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.css'
 import SocketIO from 'vue-socket.io'
+import Cookies from 'vue-cookie'
 
 Vue.use(ElementUI)
+Vue.use(Cookies)
 
 Vue.use(new SocketIO({
   debug: true,

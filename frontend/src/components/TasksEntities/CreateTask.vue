@@ -50,7 +50,7 @@ export default {
       form: {
         description: '',
         time: 'Work for...',
-        priority: 'Select priority',
+        priority: 'Select priority (not working for now)',
         username: 'admin'
       }
     }

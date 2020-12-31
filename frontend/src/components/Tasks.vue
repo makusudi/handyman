@@ -6,7 +6,11 @@
 
       <div class="d-flex">
 
-        <el-button type="info" class="mb-2" @click="update">
+        <el-button type="primary" class="mb-2" @click="emitTest">
+          <span class="text-dark">Emit test</span>
+        </el-button>
+
+        <el-button type="info" class="mb-2" @click="delToken">
           <span class="text-dark">Filter</span>
         </el-button>
 
@@ -43,6 +47,13 @@ export default {
   methods: {
     update () {
       this.$socket.emit('get_result', {username: 'admin'})
+    },
+    delToken () {
+      this.$cookie.delete('username')
+      this.$router.push({ name: 'Login' })
+    },
+    emitTest () {
+      this.$socket.emit('test', {test: 'test'})
     }
   },
   sockets: {
@@ -53,7 +64,6 @@ export default {
       this.tasks.push(data)
     },
     worker_message (data) {
-      console.log(`Received data `, data)
       for (let item of this.tasks) {
         if (item.task_id === data.task_id) {
           item.percent = parseInt(data.percent)
@@ -64,6 +74,9 @@ export default {
           }
         }
       }
+    },
+    test (data) {
+      this.$message.success(data.test)
     }
   },
   mounted () {

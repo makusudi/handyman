@@ -7,14 +7,14 @@ import logging
 import uuid
 import json
 import redis
-from celery_app.workers import some_work
+from workers.flask_workers import some_work
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 eventlet.monkey_patch()
 
 server = Flask(__name__)
-sio = SocketIO(server, mode='eventlet', message_queue='redis://localhost:6379/0', cors_allowed_origins='*')
+sio = SocketIO(server, mode='eventlet', message_queue='redis://redis_host:6379/0', cors_allowed_origins='*')
 
 
 def random_id(length):
@@ -62,22 +62,16 @@ def create_task(data: dict):
     }
     some_work.apply_async(args=[new])
     emit('create_task', new)
-    # await sio.emit('create_task', new, to=sid)
 
 
 @sio.on('get_result')
 def get_result(data):
     result = []
-    connection = redis.Redis(host='127.0.0.1', port=6379, db=1)
+    connection = redis.Redis(host='redis_host', port=6379, db=1)
     keys = connection.keys('*')
     if keys:
         result = [json.loads(connection.get(key)) for key in keys]
     return emit('get_result', result)
-
-
-@sio.on('info')
-def info(data):
-    return emit('info', {'message': 'some information from server'})
 
 
 if __name__ == '__main__':
