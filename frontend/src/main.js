@@ -8,18 +8,20 @@ import 'element-ui/lib/theme-chalk/index.css'
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.css'
 import SocketIO from 'vue-socket.io'
+import Cookies from 'vue-cookie'
 
 Vue.use(ElementUI)
+Vue.use(Cookies)
 
 Vue.use(new SocketIO({
   debug: true,
-  connection: `ws://127.0.0.1:8000/`,
+  connection: `ws://localhost:8000/`,
   // transports: ['websocket'],
   options: {
     upgrade: true,
     // path: '/io/socket.io',
-    reconnection: false,
-    autoConnect: false,
+    reconnection: true,
+    autoConnect: true,
     transports: ['websocket', 'polling']
   }
 }))

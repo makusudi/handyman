@@ -1,0 +1,57 @@
+version: "3.5"
+services: 
+  redis:
+    image: redis:5-alpine
+    ports:
+      - 6379:6379
+    container_name: handyman-redis
+    restart: always
+    environment:
+      TZ: Europe/Moscow
+    volumes:
+      - redis:/data
+  celery:
+    image: python:3.8-slim
+    build:
+      context: .
+      dockerfile: dockerfile-celery
+    container_name: handyman-celery
+    links:
+      - "redis:redis_host"
+    restart: always
+    environment:
+      TZ: Europe/Moscow
+  server:
+    image: python:3.8
+    build:
+      context: .
+      dockerfile: dockerfile-backend
+    ports:
+      - 8000:8000
+    links:
+      - "redis:redis_host"
+    container_name: handyman-backend
+    restart: always
+    environment:
+      TZ: Europe/Mocsow
+    depends_on:
+      - redis
+      - celery
+  frontend:
+    image: node:15.5.0-alpine3.10
+    build:
+      context: .
+      dockerfile: dockerfile-frontend
+    ports:
+      - 8080:8080
+    environment:
+      TZ: Europe/Mocsow
+    container_name: handyman-frontend
+    restart: always
+    depends_on:
+      - server
+
+
+volumes:
+  redis:
+    name: handyman-redis
