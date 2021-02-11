@@ -22,14 +22,13 @@ application.conf.update(
 
 
 @application.task(bind=True, name='creator')
-def some_work(self, some_data):
+def some_work(self, some_data: dict) -> dict:
     res = some_data
     connection = redis.Redis(host='redis_host', port=6379, db=1)
     print(f'Sleeping for {res.get("time")}', file=sys.stdout, flush=True)
     for x in range(int(res.get('time') / 2)):
         res['percent'] = res.get('percent') + (100 / (int(res.get('time') / 2)))
         print(f'Emitting message')
-        # sock.emit('worker_message', res, room=res.get('sid'))
         manager.emit('worker_message', res, room='admin')
         connection.set(res.get('task_id'), json.dumps(res))
         time.sleep(2)

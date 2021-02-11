@@ -6,7 +6,7 @@ fastapi_app = FastAPI()
 
 
 @fastapi_app.get('/healthcheck')
-async def healthcheck():
+async def healthcheck() -> dict:
     return {'status': 'healthy'}
 
 

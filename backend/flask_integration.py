@@ -14,10 +14,16 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(level
 eventlet.monkey_patch()
 
 server = Flask(__name__)
-sio = SocketIO(server, mode='eventlet', message_queue='redis://redis_host:6379/0', cors_allowed_origins='*')
+
+sio = SocketIO(
+    server,
+    mode='eventlet',
+    message_queue='redis://redis_host:6379/0',
+    cors_allowed_origins='*'
+)
 
 
-def random_id(length):
+def random_id(length: int):
     number = '0123456789'
     alpha = 'abcdefghijklmnopqrstuvwxyz'
     id = ''
@@ -28,7 +34,7 @@ def random_id(length):
 
 
 @sio.on('connect')
-def connect():
+def connect() -> None:
     session['uid'] = session.get('uid') or str(uuid.uuid4())
     # join_room(session['uid'])
     join_room('admin')
@@ -36,18 +42,18 @@ def connect():
 
 
 @sio.on('disconnect')
-def disconnect(data):
+def disconnect(data: dict) -> None:
     print(f'Client {data} disconnected')
 
 
 @sio.on('authenticate')
-def authenticate(data):
+def authenticate(data: dict) -> None:
     print(f'Trying to authenticate with credentials: {data}')
     emit('authenticate', {'authenticated': True})
 
 
 @sio.on('create_task')
-def create_task(data: dict):
+def create_task(data: dict) -> None:
     print(session)
     new: dict = {
         'task_id': random_id(6),
@@ -65,13 +71,13 @@ def create_task(data: dict):
 
 
 @sio.on('get_result')
-def get_result(data):
+def get_result(data: dict) -> None:
     result = []
     connection = redis.Redis(host='redis_host', port=6379, db=1)
     keys = connection.keys('*')
     if keys:
         result = [json.loads(connection.get(key)) for key in keys]
-    return emit('get_result', result)
+    emit('get_result', result)
 
 
 if __name__ == '__main__':

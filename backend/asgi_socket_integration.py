@@ -1,8 +1,10 @@
 import json
-import sys
 import random
+import sys
 import aioredis
 import socketio
+import uvicorn
+
 from workers.asgi_socket_workers import some_work
 
 
@@ -18,7 +20,7 @@ sio = socketio.AsyncServer(
 app = socketio.ASGIApp(sio)
 
 
-async def random_id(length):
+async def random_id(length: int):
     number = '0123456789'
     alpha = 'abcdefghijklmnopqrstuvwxyz'
     id = ''
@@ -29,32 +31,29 @@ async def random_id(length):
 
 
 @sio.event
-async def connect(sid, environ):
+async def connect(sid: str, environ: str) -> None:
     print(f'Connected user with sid {sid}', file=sys.stdout, flush=True)
     sio.enter_room(sid, 'admin')
 
 
 @sio.event
-async def test(sid, message):
-    print(f'Received test message from sid {sid}', file=sys.stdout, flush=True)
-    print(f'Rooms ')
+async def test(sid: str, message: dict) -> None:
     await sio.emit('test', {'test': 'success!'}, room='admin')
 
 
 @sio.event
-async def disconnect(sid):
+async def disconnect(sid: str) -> None:
     print(f'Client {sid} disconnected')
 
 
 @sio.event
-async def authenticate(sid, data):
+async def authenticate(sid: str, data: dict) -> None:
     print(f'Trying to authenticate with credentials: {data}')
     await sio.emit('authenticate', {'authenticated': True}, to=sid)
 
 
 @sio.event
-async def create_task(sid: str, data: dict):
-    print(f'Create task from sid {sid}')
+async def create_task(sid: str, data: dict) -> None:
     new: dict = {
         'task_id': await random_id(6),
         'description': data.get('description'),
@@ -71,11 +70,10 @@ async def create_task(sid: str, data: dict):
 
 
 @sio.event
-async def get_result(sid, data):
+async def get_result(sid: str, data: dict):
     result = []
     redis = await aioredis.create_redis_pool('redis://redis_host:6379/1')
     keys = await redis.keys('*')
-    print(f'KEYS = {keys}')
     if keys:
         result = [json.loads(await redis.get(key)) for key in keys]
 
@@ -83,7 +81,4 @@ async def get_result(sid, data):
 
 
 if __name__ == '__main__':
-    import uvicorn
     uvicorn.run(app=app, host='0.0.0.0', port=8000)
-
-
