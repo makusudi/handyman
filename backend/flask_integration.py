@@ -23,7 +23,7 @@ sio = SocketIO(
 )
 
 
-def random_id(length: int):
+def random_id(length: int) -> str:
     number = '0123456789'
     alpha = 'abcdefghijklmnopqrstuvwxyz'
     id = ''

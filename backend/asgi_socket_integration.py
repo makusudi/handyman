@@ -20,7 +20,7 @@ sio = socketio.AsyncServer(
 app = socketio.ASGIApp(sio)
 
 
-async def random_id(length: int):
+async def random_id(length: int) -> str:
     number = '0123456789'
     alpha = 'abcdefghijklmnopqrstuvwxyz'
     id = ''

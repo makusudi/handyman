@@ -36,7 +36,7 @@ def some_work(self, some_data: dict) -> dict:
 
 
 @task_postrun.connect()
-def task_postrun(retval=None, task_id=None, task=None, args=None, **kwargs):
+def task_postrun(retval=None, task_id=None, task=None, args=None, **kwargs) -> None:
     print(f'Finishing with task {task}')
     connection = redis.Redis(host='redis_host', port=6379, db=1)
     retval['percent'] = 100
