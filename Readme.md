@@ -9,7 +9,9 @@ Have fun :)
 
 ### Details
 Project uses Socket.io as a transport protocol between backend, workers and client.  
-All results and some temporary transport details stores in Redis.
+All results and some temporary transport details stores in Redis.   
+Dummy work provided by Celery worker is a string reversing. For example, if you call your task as "TASK", worker 
+will return "KSAT" as a result of your task.
 
 ### Running
     docker-compose build
