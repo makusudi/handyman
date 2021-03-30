@@ -12,8 +12,8 @@
     >
 
       <el-menu-item index="/">Home</el-menu-item>
-      <el-menu-item index="/tasks">Tasks</el-menu-item>
-      <el-menu-item index="/chat" disabled>Chat</el-menu-item>
+      <el-menu-item index="/storage">Storage</el-menu-item>
+      <el-menu-item index="/dummy">Dummy</el-menu-item>
 
     </el-menu>
     <div id="app">
@@ -29,8 +29,10 @@ export default {
   name: 'App',
   computed: {
     defaultRoute () {
-      if (this.$route.fullPath.match('tasks')) {
-        return '/tasks'
+      if (this.$route.fullPath.match('dummy')) {
+        return '/dummy'
+      } else if (this.$route.fullPath.match('storage')) {
+        return '/storage'
       } else {
         return '/'
       }

@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Index from '@/components/Index'
 import Tasks from '@/components/Tasks'
+import Storage from '@/components/Storage'
 import Login from '@/components/Login'
 
 Vue.use(Router)
@@ -15,9 +16,14 @@ export default new Router({
       component: Index
     },
     {
-      path: '/tasks',
-      name: 'Tasks',
+      path: '/dummy',
+      name: 'Dummy',
       component: Tasks
+    },
+    {
+      path: '/storage',
+      name: 'Storage',
+      component: Storage
     },
     {
       path: '/login',
